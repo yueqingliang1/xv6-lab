@@ -100,6 +100,10 @@ sys_uptime(void)
 uint64
 sys_trace(void)
 {
-    printf("sys_trace: Hi!\n");
+    int mask;
+    if(argint(0, &mask) < 0)
+        return -1;
+    struct proc *p = myproc(); //获取当前进程
+    p->trace_mask = mask; //给在proc.h中声明的进程的字段赋值
     return 0;
 }

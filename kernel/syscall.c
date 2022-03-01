@@ -146,8 +146,12 @@ syscall(void)
 
   num = p->trapframe->a7;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    printf("%s被调用了！\n", syscall_names[num - 1]);
     p->trapframe->a0 = syscalls[num]();
+    int trace_mask = p->trace_mask; //接收or获取当前mask
+    //判断mask有没有命中
+    if ((trace_mask >> num) & 1) {  //左移num位后个位上是不是1
+        printf("%d: syscall %s -> %d\n", p->pid, syscall_names[num - 1], p->trapframe->a0);
+    }
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);
